@@ -1,9 +1,0 @@
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\bin\Debug\netcoreapp3.1\Database.deps.json
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\bin\Debug\netcoreapp3.1\Database.dll
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\bin\Debug\netcoreapp3.1\Database.pdb
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\obj\Debug\netcoreapp3.1\Database.csprojAssemblyReference.cache
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\obj\Debug\netcoreapp3.1\Database.AssemblyInfoInputs.cache
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\obj\Debug\netcoreapp3.1\Database.AssemblyInfo.cs
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\obj\Debug\netcoreapp3.1\Database.csproj.CoreCompileInputs.cache
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\obj\Debug\netcoreapp3.1\Database.dll
-C:\Users\Thiseas\RiderProjects\WorkforceManagerAPI\Database\obj\Debug\netcoreapp3.1\Database.pdb
