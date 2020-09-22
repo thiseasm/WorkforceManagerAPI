@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\Thiseas\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\Thiseas\\.nuget\\packages"
+    ]
+  }
+}
