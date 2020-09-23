@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Database.DbModels
 {
@@ -9,8 +11,10 @@ namespace Database.DbModels
         [Required]
         public Employee Target { get; set; }
         [Required]
-        public Skill TargetSkill { get; set; }
-        [Required]
         public string Description { get; set; }
+        [Required]
+        public DateTime Date { get; set; }
+        [Required]
+        public ICollection<Skill> TargetSkill { get; set; }
     }
 }

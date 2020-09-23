@@ -14,6 +14,8 @@ namespace Database.DbModels
         public string Surname { get; set; }
         [Required]
         public DateTime HiringDate { get; set; }
+        [Required]
+        public bool IsDeleted { get; set; }
         
         public ICollection<Skill> Skillset { get; set; }
     }

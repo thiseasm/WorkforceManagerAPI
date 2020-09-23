@@ -1,12 +1,12 @@
 using Database.DbModels;
-using Domain.Interfaces;
-using Domain.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Repository.Interfaces;
+using Repository.Repositories;
 
 namespace WorkforceManagerAPI
 {
@@ -25,9 +25,9 @@ namespace WorkforceManagerAPI
             services.AddDbContext<WorkforceContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("WorkforceDatabase")));
 
-            services.AddScoped<ISkillService, SkillService>();
-            services.AddScoped<IEmployeeService, EmployeeService>();
-            services.AddScoped<IHistoryService, HistoryService>();
+            services.AddScoped<ISkillRepository, SkillRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IHistoryRepository, HistoryRepository>();
 
             services.AddControllers();
         }
