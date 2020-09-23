@@ -33,5 +33,10 @@ namespace Repository.Repositories
             
             _workforceDbContext.SaveChanges();
         }
+
+        public void Delete(Skill skill)
+        {
+            _workforceDbContext.Skills.Remove(skill);
+        }
     }
 }
