@@ -34,9 +34,17 @@ namespace Repository.Repositories
             _workforceDbContext.SaveChanges();
         }
 
-        public void Delete(Skill skill)
+        public void Delete(int id)
         {
-            _workforceDbContext.Skills.Remove(skill);
+            var skillToBeRemoved = _workforceDbContext.Skills.Find(id);
+            _workforceDbContext.Skills.Remove(skillToBeRemoved);
+            _workforceDbContext.SaveChanges();
+        }
+
+        public void MassDelete(List<int> ids)
+        {
+            var skillsToBeRemoved = _workforceDbContext.Skills.Where(s => ids.Contains(s.Id));
+            _workforceDbContext.RemoveRange(skillsToBeRemoved);
         }
     }
 }

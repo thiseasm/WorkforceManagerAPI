@@ -22,7 +22,7 @@ namespace WorkforceManagerAPI.Controllers
 
         // GET: api/Employee
         [HttpGet]
-        public ActionResult<IEnumerable<Employee>> GetEmployee()
+        public ActionResult<IEnumerable<Employee>> GetEmployees()
         {
             return _employeeRepository.GetAll();
         }
@@ -34,10 +34,8 @@ namespace WorkforceManagerAPI.Controllers
             var employee = _employeeRepository.GetEmployeeById(id);
 
             if (employee == null)
-            {
                 return NotFound();
-            }
-
+            
             return employee;
         }
 
@@ -46,7 +44,7 @@ namespace WorkforceManagerAPI.Controllers
         public ActionResult<Employee> SaveEmployee(Employee employee)
         {
             LogHistoryAndSave(employee);
-            return CreatedAtAction("GetEmployee",null);
+            return CreatedAtAction("GetEmployees",null);
         }
 
         // DELETE: api/Employee/id
