@@ -26,5 +26,11 @@ namespace Repository.Repositories
                 .OrderByDescending(h => h.Date)
                 .ToList();
         }
+
+        public void LogEntry(HistoryEntry entry)
+        {
+            _workforceDbContext.History.Add(entry);
+            _workforceDbContext.SaveChanges();
+        }
     }
 }

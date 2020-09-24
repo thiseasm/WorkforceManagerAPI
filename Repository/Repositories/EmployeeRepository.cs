@@ -38,9 +38,10 @@ namespace Repository.Repositories
         public void SaveOrUpdate(Employee employee)
         {
             if(employee.Id == 0)
-                _workforceDbContext.Employees.Update(employee);
+                _workforceDbContext.Employees.Add(employee);
             else
-             _workforceDbContext.Employees.Add(employee);
+                _workforceDbContext.Employees.Update(employee);
+             
             
             _workforceDbContext.SaveChanges();
         }

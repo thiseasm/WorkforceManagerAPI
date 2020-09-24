@@ -15,6 +15,6 @@ namespace Database.DbModels
         [Required]
         public DateTime Date { get; set; }
         [Required]
-        public ICollection<Skill> TargetSkill { get; set; }
+        public ICollection<Skill> ChangedSkills { get; set; }
     }
 }

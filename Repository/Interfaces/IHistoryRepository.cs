@@ -7,5 +7,6 @@ namespace Repository.Interfaces
     {
         List<HistoryEntry> GetAll();
         List<HistoryEntry> GetEntriesForEmployee(int employeeId);
+        void LogEntry(HistoryEntry entry);
     }
 }
