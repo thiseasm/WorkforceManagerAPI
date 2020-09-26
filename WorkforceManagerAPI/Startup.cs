@@ -29,6 +29,17 @@ namespace WorkforceManagerAPI
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IHistoryRepository, HistoryRepository>();
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
+
             services.AddControllers();
         }
 
@@ -41,6 +52,8 @@ namespace WorkforceManagerAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors();
 
             app.UseRouting();
 
