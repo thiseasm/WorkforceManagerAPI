@@ -150,7 +150,7 @@ namespace WorkforceManagerAPI.Controllers
             }
             
 
-            if (employee.Skillset == null || !employee.Skillset.Any())
+            if (employee.EmployeeSkillset == null || !employee.Skillset.Any())
             {
                 result.Success = true;
                 return result;

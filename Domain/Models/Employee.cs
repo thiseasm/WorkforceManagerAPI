@@ -22,6 +22,7 @@ namespace Domain.Models
         [Required]
         public bool IsDeleted { get; set; }
         
-        public ICollection<Skill> Skillset { get; set; }
+        public ICollection<EmployeeSkill> EmployeeSkillset { get; set; }
+        public ICollection<HistoryEntry> History { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models
@@ -15,5 +16,9 @@ namespace Domain.Models
         public DateTime CreatedAt { get; set; }
 
         public string Description { get; set; }
+
+        public ICollection<EmployeeSkill> EmployeeSkill { get; set; }
+
+        public ICollection<SkillHistory> SkillHistory { get; set; }
     }
 }
