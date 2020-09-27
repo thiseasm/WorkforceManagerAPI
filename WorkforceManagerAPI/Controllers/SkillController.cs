@@ -61,9 +61,7 @@ namespace WorkforceManagerAPI.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Skill> DeleteSkill(int id)
         {
-
             var removeResult = _skillRepository.RemoveSkill(id);
-            
 
             if (removeResult.Success)
                 return Ok();
@@ -74,9 +72,9 @@ namespace WorkforceManagerAPI.Controllers
             return BadRequest();
         }
 
-        // DELETE: api/Skill/MassRemoveEmployees
+        // DELETE: api/Skill/MassRemoveSkills
         [HttpDelete]
-        [Route("MassRemoveEmployees")]
+        [Route("MassRemoveSkills")]
         public ActionResult<Skill> MassDelete(List<int> ids)
         {
             var removeResult = _skillRepository.MassRemoveSkills(ids);
