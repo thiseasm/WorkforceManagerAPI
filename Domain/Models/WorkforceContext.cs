@@ -7,6 +7,8 @@ namespace Domain.Models
         public DbSet<Skill> Skills { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<HistoryEntry> History { get; set; }
+        public DbSet<SkillHistory> SkillHistory { get; set; }
+        public DbSet<EmployeeSkill> EmployeeSkills { get; set; }
         
         public WorkforceContext(DbContextOptions<WorkforceContext> options) : base(options) { }
 
@@ -19,7 +21,6 @@ namespace Domain.Models
                 .HasOne(es => es.Employee)
                 .WithMany(e => e.EmployeeSkillset)
                 .HasForeignKey(es => es.EmployeeId);
-
 
             modelBuilder.Entity<EmployeeSkill>()
                 .HasOne(es => es.Skill)

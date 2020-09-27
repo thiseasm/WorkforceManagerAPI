@@ -7,6 +7,7 @@ namespace Domain.Interfaces
     {
         GenericResult<List<Skill>> GetAll();
         GenericResult<Skill> GetSkillById(int id);
+        GenericResult<List<Skill>> GetSkillsById(List<int> ids);
         Result SaveSkill(Skill skill);
         Result RemoveSkill(int id);
         Result MassRemoveSkills(List<int> ids);

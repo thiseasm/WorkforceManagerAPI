@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Interfaces;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Repositories
 {
@@ -36,7 +37,9 @@ namespace Domain.Repositories
             var result = new GenericResult<Employee>();
             try
             {
-                result.Data = _workforceDbContext.Employees.FirstOrDefault(e => e.Id == id && !e.IsDeleted);
+                result.Data = _workforceDbContext.Employees.Where(e => e.Id == id && !e.IsDeleted)
+                    .Include(e => e.EmployeeSkillset)
+                    .ThenInclude(es => es.Skill).FirstOrDefault();
                 result.Success = true;
             }
             catch (Exception ex)

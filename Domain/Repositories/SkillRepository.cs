@@ -47,6 +47,22 @@ namespace Domain.Repositories
             return result;
         }
 
+        public GenericResult<List<Skill>> GetSkillsById(List<int> ids)
+        {
+            var result = new GenericResult<List<Skill>>();
+            try
+            {
+                result.Data = _workforceDbContext.Skills.Where(s => ids.Contains(s.Id)).ToList();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
         public Result SaveSkill(Skill skill)
         {
 

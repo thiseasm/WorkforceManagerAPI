@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Models
 {
@@ -21,6 +22,9 @@ namespace Domain.Models
 
         [Required]
         public bool IsDeleted { get; set; }
+
+        [NotMapped]
+        public List<int> SkillIds { get; set; }
         
         public ICollection<EmployeeSkill> EmployeeSkillset { get; set; }
         public ICollection<HistoryEntry> History { get; set; }

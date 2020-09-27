@@ -13,11 +13,13 @@ namespace WorkforceManagerAPI.Controllers
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IHistoryRepository _historyRepository;
+        private readonly ISkillRepository _skillRepository;
 
-        public EmployeeController(IEmployeeRepository employeeRepository, IHistoryRepository historyRepository)
+        public EmployeeController(IEmployeeRepository employeeRepository, IHistoryRepository historyRepository, ISkillRepository skillRepository)
         {
             _employeeRepository = employeeRepository;
             _historyRepository = historyRepository;
+            _skillRepository = skillRepository;
         }
 
         // GET: api/Employee
@@ -117,21 +119,33 @@ namespace WorkforceManagerAPI.Controllers
         private Result UpdateEmployee(Employee employee,Employee registered)
         {
             var result = new Result();
-            var removedEntry = GenerateRemovedEntry(employee, registered);
-            var addedEntry = GeneratedAddedEntry(employee, registered);
+            var employeeSkills = new List<EmployeeSkill>();
+
+            if (employee.SkillIds == null || !employee.SkillIds.Any())
+            {
+                var getSkillsResult = _skillRepository.GetSkillsById(employee.SkillIds);
+                if (!getSkillsResult.Success)
+                    return result;
+
+                employeeSkills.AddRange(getSkillsResult.Data.Select(skill => new EmployeeSkill {Employee = employee, Skill = skill}));
+
+                var removedEntry = GenerateRemovedEntry(employee, registered);
+                var addedEntry = GeneratedAddedEntry(employee, registered);
+                employee.EmployeeSkillset = employeeSkills;
+                employee.History.Add(removedEntry);
+                employee.History.Add(addedEntry);
+            }
+            else
+            {
+                employee.EmployeeSkillset.Clear();
+                var removedEntry = GenerateRemovedEntry(employee, registered);
+                employee.History.Add(removedEntry);
+            }
 
             var saveResult = _employeeRepository.SaveEmployee(employee);
             if (!saveResult.Success)
             {
                 result.Message ="SaveEmployeeFailed";
-                return result;
-            }
-
-            var entries = new List<HistoryEntry>{addedEntry,removedEntry};
-            var saveHistoryResult = _historyRepository.LogEntries(entries);
-            if (!saveHistoryResult.Success)
-            {
-                result.Message = "SaveHistoryFailed";
                 return result;
             }
 
@@ -142,25 +156,25 @@ namespace WorkforceManagerAPI.Controllers
         private Result RegisterEmployee(Employee employee)
         {
             var result = new Result();
+            var employeeSkills = new List<EmployeeSkill>();
+
+            if (employee.SkillIds == null || !employee.SkillIds.Any())
+            {
+                var getSkillsResult = _skillRepository.GetSkillsById(employee.SkillIds);
+                if (!getSkillsResult.Success)
+                    return result;
+
+                employeeSkills.AddRange(getSkillsResult.Data.Select(skill => new EmployeeSkill {Employee = employee, Skill = skill}));
+
+                var historyEntry = GeneratedAddedEntry(employee, getSkillsResult.Data);
+                employee.EmployeeSkillset = employeeSkills;
+                employee.History.Add(historyEntry);
+            }
+
             var saveResult = _employeeRepository.SaveEmployee(employee);
             if (!saveResult.Success)
             {
                 result.Message ="SaveEmployeeFailed";
-                return result;
-            }
-            
-
-            if (employee.EmployeeSkillset == null || !employee.Skillset.Any())
-            {
-                result.Success = true;
-                return result;
-            }
-
-            var entry = GeneratedAddedEntry(employee);
-            var saveHistoryResult = _historyRepository.LogEntry(entry);
-            if (!saveHistoryResult.Success)
-            {
-                result.Message = "SaveHistoryFailed";
                 return result;
             }
 
@@ -168,43 +182,66 @@ namespace WorkforceManagerAPI.Controllers
             return result;
         }
 
-        private static HistoryEntry GeneratedAddedEntry(Employee employee)
+        private static HistoryEntry GeneratedAddedEntry(Employee employee, IEnumerable<Skill> addedSkills)
         {
-            return new HistoryEntry
+            var historyEntry = new HistoryEntry
+            {
+                CreatedAt = DateTimeOffset.Now,
+                Description = "Added",
+                Target = employee
+            };
+
+            var changedSkills = addedSkills.Select(skill => new SkillHistory {HistoryEntry = historyEntry, Skill = skill}).ToList();
+            historyEntry.ChangedSkills = changedSkills;
+            return historyEntry;
+        }
+
+        private HistoryEntry GeneratedAddedEntry(Employee employee, Employee registeredEmployee)
+        {
+            var skillIdsAdded = employee.SkillIds
+                                        .Where(id => !registeredEmployee.EmployeeSkillset
+                                                .Select(s => s.SkillId)
+                                                .Contains(id))
+                                        .ToList();
+
+            var getSkillsAddedResult = _skillRepository.GetSkillsById(skillIdsAdded);
+            if (!getSkillsAddedResult.Success)
+                return null;
+
+            var historyEntry = new HistoryEntry
             {
                 CreatedAt = DateTimeOffset.Now,
                 Description = "Added",
                 Target = employee,
-                ChangedSkills = employee.Skillset
             };
+            var addedSkills = getSkillsAddedResult.Data.Select(skill => new SkillHistory {HistoryEntry = historyEntry, Skill = skill}).ToList();
+
+            historyEntry.ChangedSkills = addedSkills;
+            return historyEntry;
         }
 
-        private static HistoryEntry GeneratedAddedEntry(Employee employee, Employee registeredEmployee)
+        private HistoryEntry GenerateRemovedEntry(Employee employee, Employee registeredEmployee)
         {
-            var skillsAdded = employee.Skillset.Where(e => !registeredEmployee.Skillset.Select(s => s.Id).Contains(e.Id))
-                .ToList();
+            var skillIdsRemoved = registeredEmployee.EmployeeSkillset
+                                            .Select(es => es.SkillId)
+                                            .Where(e => !employee.SkillIds.Contains(e))
+                                        .ToList();
 
-            return new HistoryEntry
-            {
-                CreatedAt = DateTimeOffset.Now,
-                Description = "Added",
-                Target = employee,
-                ChangedSkills = skillsAdded
-            };
-        }
+            var getSkillsRemovedResult = _skillRepository.GetSkillsById(skillIdsRemoved);
+            if (!getSkillsRemovedResult.Success)
+                return null;
 
-        private static HistoryEntry GenerateRemovedEntry(Employee employee, Employee registeredEmployee)
-        {
-            var skillsRemoved = registeredEmployee.Skillset.Where(e => !employee.Skillset.Select(s => s.Id).Contains(e.Id))
-                .ToList();
-
-            return new HistoryEntry
+            var historyEntry = new HistoryEntry
             {
                 CreatedAt = DateTimeOffset.Now,
                 Description = "Removed",
-                Target = employee,
-                ChangedSkills = skillsRemoved
+                Target = employee
             };
+
+            var removedSkills = getSkillsRemovedResult.Data.Select(skill => new SkillHistory {HistoryEntry = historyEntry, Skill = skill}).ToList();
+
+            historyEntry.ChangedSkills = removedSkills;
+            return historyEntry;
         }
     }
 }
