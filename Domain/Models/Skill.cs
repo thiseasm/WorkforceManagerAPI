@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Database.DbModels
+namespace Domain.Models
 {
     public class Skill
     {

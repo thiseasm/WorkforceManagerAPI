@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Database.DbModels
+namespace Domain.Models
 {
     public class WorkforceContext  : DbContext
     {

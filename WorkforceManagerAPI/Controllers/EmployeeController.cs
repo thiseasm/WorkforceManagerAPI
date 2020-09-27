@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Database.DbModels;
+using Domain.Interfaces;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Repository.Interfaces;
 
 namespace WorkforceManagerAPI.Controllers
 {

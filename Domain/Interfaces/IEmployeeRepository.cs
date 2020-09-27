@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using Database.DbModels;
+using Domain.Models;
 
-namespace Repository.Interfaces
+namespace Domain.Interfaces
 {
     public interface IEmployeeRepository
     {
         List<Employee> GetAll();
         Employee GetEmployeeById(int id);
-        Employee GetEmployeeBySearchTerm(string term);
+        List<Employee> GetEmployeesBySearchTerm(string term);
         void RemoveEmployee(int id);
         void SaveEmployee(Employee employee);
         void MassRemoveEmployees(List<int> ids);

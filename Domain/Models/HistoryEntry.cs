@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Database.DbModels
+namespace Domain.Models
 {
     public class HistoryEntry
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Database.DbModels;
-using Repository.Interfaces;
+using Domain.Interfaces;
+using Domain.Models;
 
-namespace Repository.Repositories
+namespace Domain.Repositories
 {
     public class HistoryRepository : IHistoryRepository
     {

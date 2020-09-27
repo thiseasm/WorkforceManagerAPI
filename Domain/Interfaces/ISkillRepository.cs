@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Database.DbModels;
+using Domain.Models;
 
-namespace Repository.Interfaces
+namespace Domain.Interfaces
 {
     public interface ISkillRepository
     {
