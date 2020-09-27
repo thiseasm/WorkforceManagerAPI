@@ -15,9 +15,9 @@ namespace Domain.Repositories
             _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
         }
 
-        public Result<List<HistoryEntry>> GetAll()
+        public GenericResult<List<HistoryEntry>> GetAll()
         {
-            var result = new Result<List<HistoryEntry>>();
+            var result = new GenericResult<List<HistoryEntry>>();
             try
             {
                 result.Data = _workforceDbContext.History.OrderByDescending(h => h.CreatedAt).ToList();
@@ -31,9 +31,9 @@ namespace Domain.Repositories
             return result;
         }
 
-        public Result<List<HistoryEntry>> GetEntriesForEmployee(int employeeId)
+        public GenericResult<List<HistoryEntry>> GetEntriesForEmployee(int employeeId)
         {
-            var result = new Result<List<HistoryEntry>>();
+            var result = new GenericResult<List<HistoryEntry>>();
             try
             {
                 result.Data = _workforceDbContext.History
@@ -50,10 +50,20 @@ namespace Domain.Repositories
             return result;
         }
 
-        public void LogEntry(HistoryEntry entry)
+        public Result LogEntry(HistoryEntry entry)
         {
-            _workforceDbContext.History.Add(entry);
-            _workforceDbContext.SaveChanges();
+            var result = new Result();
+            try
+            {
+                _workforceDbContext.History.Add(entry);
+                _workforceDbContext.SaveChanges();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+            return  result
         }
     }
 }

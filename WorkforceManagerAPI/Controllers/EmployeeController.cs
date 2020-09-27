@@ -24,7 +24,14 @@ namespace WorkforceManagerAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Employee>> GetEmployees()
         {
-            return _employeeRepository.GetAll();
+            var employees = _employeeRepository.GetAll();
+            if (employees.Success)
+            {
+                return employees.Data;
+            }
+
+            return NotFound();
+
         }
 
         // GET: api/Employee/id
@@ -33,10 +40,12 @@ namespace WorkforceManagerAPI.Controllers
         {
             var employee = _employeeRepository.GetEmployeeById(id);
 
-            if (employee == null)
-                return NotFound();
-            
-            return employee;
+            if (employee.Success)
+            {
+                return employee.Data;
+            }
+
+            return NotFound();
         }
 
         // POST: api/Employee

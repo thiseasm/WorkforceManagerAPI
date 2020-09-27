@@ -5,8 +5,8 @@ namespace Domain.Interfaces
 {
     public interface IHistoryRepository
     {
-        Result<List<HistoryEntry>> GetAll();
-        Result<List<HistoryEntry>> GetEntriesForEmployee(int employeeId);
-        void LogEntry(HistoryEntry entry);
+        GenericResult<List<HistoryEntry>> GetAll();
+        GenericResult<List<HistoryEntry>> GetEntriesForEmployee(int employeeId);
+        Result LogEntry(HistoryEntry entry);
     }
 }

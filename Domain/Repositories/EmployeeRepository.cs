@@ -15,9 +15,9 @@ namespace Domain.Repositories
             _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
         }
 
-        public Result<List<Employee>> GetAll()
+        public GenericResult<List<Employee>> GetAll()
         {
-            var result = new Result<List<Employee>>();
+            var result = new GenericResult<List<Employee>>();
             try
             {
                 result.Data = _workforceDbContext.Employees.Where(e => !e.IsDeleted).OrderBy(e => e.Surname).ToList();
@@ -31,9 +31,9 @@ namespace Domain.Repositories
             return result;
         }
 
-        public Result<Employee> GetEmployeeById(int id)
+        public GenericResult<Employee> GetEmployeeById(int id)
         {
-            var result = new Result<Employee>();
+            var result = new GenericResult<Employee>();
             try
             {
                 result.Data = _workforceDbContext.Employees.FirstOrDefault(e => e.Id == id && !e.IsDeleted);
@@ -47,9 +47,9 @@ namespace Domain.Repositories
             return result;
         }
 
-        public Result<List<Employee>> GetEmployeesBySearchTerm(string term)
+        public GenericResult<List<Employee>> GetEmployeesBySearchTerm(string term)
         {
-            var result = new Result<List<Employee>>();
+            var result = new GenericResult<List<Employee>>();
             try
             {
                 result.Data = _workforceDbContext.Employees.Where(e => e.Name.Contains(term) || e.Surname.Contains(term)).ToList();
@@ -63,37 +63,75 @@ namespace Domain.Repositories
             return result;
         }
 
-        public void RemoveEmployee(int id)
+        public Result RemoveEmployee(int id)
         {
+            var result = new Result();
             var employee = _workforceDbContext.Employees.FirstOrDefault(e => e.Id == id);
-            if(employee == null || employee.IsDeleted)
-                return;
+            if (employee == null || employee.IsDeleted)
+            {
+                result.Message = "NotFound";
+                return result;
+            }
+                
 
             employee.IsDeleted = true;
-            _workforceDbContext.Employees.Update(employee);
-            _workforceDbContext.SaveChanges();
-        }
 
-        public void SaveEmployee(Employee employee)
-        {
-            if(employee.Id == 0)
-                _workforceDbContext.Employees.Add(employee);
-            else
+            try
+            {
                 _workforceDbContext.Employees.Update(employee);
-             
-            
-            _workforceDbContext.SaveChanges();
+                _workforceDbContext.SaveChanges();
+                result.Success = true;
+            }
+            catch(Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
 
-        public void MassRemoveEmployees(List<int> ids)
+        public Result SaveEmployee(Employee employee)
         {
+            var result = new Result();
+            try
+            {
+                if (employee.Id == 0)
+                    _workforceDbContext.Employees.Add(employee);
+                else
+                    _workforceDbContext.Employees.Update(employee);
+            
+                _workforceDbContext.SaveChanges();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public Result MassRemoveEmployees(List<int> ids)
+        {
+            var result = new Result();
             var employeesToBeDeleted = _workforceDbContext.Employees.Where(e => ids.Contains(e.Id));
             foreach (var employee in employeesToBeDeleted)
             {
                 employee.IsDeleted = true;
             }
-            _workforceDbContext.Employees.UpdateRange(employeesToBeDeleted);
-            _workforceDbContext.SaveChanges();
+
+            try
+            {
+                _workforceDbContext.Employees.UpdateRange(employeesToBeDeleted);
+                _workforceDbContext.SaveChanges();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
     }
 }
