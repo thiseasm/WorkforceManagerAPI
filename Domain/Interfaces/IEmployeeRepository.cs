@@ -5,9 +5,9 @@ namespace Domain.Interfaces
 {
     public interface IEmployeeRepository
     {
-        List<Employee> GetAll();
-        Employee GetEmployeeById(int id);
-        List<Employee> GetEmployeesBySearchTerm(string term);
+        Result<List<Employee>> GetAll();
+        Result<Employee> GetEmployeeById(int id);
+        Result<List<Employee>> GetEmployeesBySearchTerm(string term);
         void RemoveEmployee(int id);
         void SaveEmployee(Employee employee);
         void MassRemoveEmployees(List<int> ids);

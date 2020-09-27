@@ -15,17 +15,39 @@ namespace Domain.Repositories
             _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
         }
 
-        public List<HistoryEntry> GetAll()
+        public Result<List<HistoryEntry>> GetAll()
         {
-            return _workforceDbContext.History.OrderByDescending(h => h.CreatedAt).ToList();
+            var result = new Result<List<HistoryEntry>>();
+            try
+            {
+                result.Data = _workforceDbContext.History.OrderByDescending(h => h.CreatedAt).ToList();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
 
-        public List<HistoryEntry> GetEntriesForEmployee(int employeeId)
+        public Result<List<HistoryEntry>> GetEntriesForEmployee(int employeeId)
         {
-            return _workforceDbContext.History
-                .Where(h => h.Target.Id == employeeId)
-                .OrderByDescending(h => h.CreatedAt)
-                .ToList();
+            var result = new Result<List<HistoryEntry>>();
+            try
+            {
+                result.Data = _workforceDbContext.History
+                    .Where(h => h.Target.Id == employeeId)
+                    .OrderByDescending(h => h.CreatedAt)
+                    .ToList();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
 
         public void LogEntry(HistoryEntry entry)

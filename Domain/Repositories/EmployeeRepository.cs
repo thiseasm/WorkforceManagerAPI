@@ -15,19 +15,52 @@ namespace Domain.Repositories
             _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
         }
 
-        public List<Employee> GetAll()
+        public Result<List<Employee>> GetAll()
         {
-            return _workforceDbContext.Employees.Where(e => !e.IsDeleted).OrderBy(e => e.Surname).ToList();
+            var result = new Result<List<Employee>>();
+            try
+            {
+                result.Data = _workforceDbContext.Employees.Where(e => !e.IsDeleted).OrderBy(e => e.Surname).ToList();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
 
-        public Employee GetEmployeeById(int id)
+        public Result<Employee> GetEmployeeById(int id)
         {
-            return _workforceDbContext.Employees.FirstOrDefault(e => e.Id == id && !e.IsDeleted);
+            var result = new Result<Employee>();
+            try
+            {
+                result.Data = _workforceDbContext.Employees.FirstOrDefault(e => e.Id == id && !e.IsDeleted);
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
 
-        public List<Employee> GetEmployeesBySearchTerm(string term)
+        public Result<List<Employee>> GetEmployeesBySearchTerm(string term)
         {
-            return _workforceDbContext.Employees.Where(e => e.Name.Contains(term) || e.Surname.Contains(term)).ToList();
+            var result = new Result<List<Employee>>();
+            try
+            {
+                result.Data = _workforceDbContext.Employees.Where(e => e.Name.Contains(term) || e.Surname.Contains(term)).ToList();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
 
         public void RemoveEmployee(int id)

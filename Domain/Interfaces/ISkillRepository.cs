@@ -5,8 +5,8 @@ namespace Domain.Interfaces
 {
     public interface ISkillRepository
     {
-        List<Skill> GetAll();
-        Skill GetSkillById(int id);
+        Result<List<Skill>> GetAll();
+        Result<Skill> GetSkillById(int id);
         void SaveSkill(Skill skill);
         void RemoveSkill(int id);
         void MassRemoveSkills(List<int> ids);
