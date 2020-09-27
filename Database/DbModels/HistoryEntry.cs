@@ -8,12 +8,15 @@ namespace Database.DbModels
     {
         [Required]
         public int Id { get; set; }
+
         [Required]
         public Employee Target { get; set; }
+
         [Required]
+        [StringLength(50)]
         public string Description { get; set; }
         [Required]
-        public DateTime Date { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         [Required]
         public ICollection<Skill> ChangedSkills { get; set; }
     }

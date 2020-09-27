@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Database.DbModels;
 using Repository.Interfaces;
@@ -11,12 +12,12 @@ namespace Repository.Repositories
 
         public SkillRepository(WorkforceContext workforceContext)
         {
-            _workforceDbContext = workforceContext;
+            _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
         }
 
         public List<Skill> GetAll()
         {
-            return _workforceDbContext.Skills.OrderBy(s => s.Name).ToList();
+            return _workforceDbContext.Skills.OrderBy(s => s.Title).ToList();
         }
 
         public Skill GetSkillById(int id)
@@ -24,7 +25,7 @@ namespace Repository.Repositories
             return _workforceDbContext.Skills.FirstOrDefault(s => s.Id == id);
         }
 
-        public void SaveOrUpdate(Skill skill)
+        public void SaveSkill(Skill skill)
         {
             if(skill.Id == 0)
                 _workforceDbContext.Skills.Update(skill);
@@ -34,14 +35,14 @@ namespace Repository.Repositories
             _workforceDbContext.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void RemoveSkill(int id)
         {
             var skillToBeRemoved = _workforceDbContext.Skills.Find(id);
             _workforceDbContext.Skills.Remove(skillToBeRemoved);
             _workforceDbContext.SaveChanges();
         }
 
-        public void MassDelete(List<int> ids)
+        public void MassRemoveSkills(List<int> ids)
         {
             var skillsToBeRemoved = _workforceDbContext.Skills.Where(s => ids.Contains(s.Id));
             _workforceDbContext.RemoveRange(skillsToBeRemoved);

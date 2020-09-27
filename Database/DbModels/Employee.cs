@@ -8,12 +8,17 @@ namespace Database.DbModels
     {
         [Required]
         public int Id { get; set; }
+
         [Required]
+        [StringLength(100)]
         public string Name { get; set; }
+
         [Required]
+        [StringLength(150)]
         public string Surname { get; set; }
-        [Required]
-        public DateTime HiringDate { get; set; }
+
+        public DateTimeOffset HiredAt { get; set; }
+
         [Required]
         public bool IsDeleted { get; set; }
         

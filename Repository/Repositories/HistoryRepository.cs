@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Database.DbModels;
 using Repository.Interfaces;
@@ -11,19 +12,19 @@ namespace Repository.Repositories
 
         public HistoryRepository(WorkforceContext workforceContext)
         {
-            _workforceDbContext = workforceContext;
+            _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
         }
 
         public List<HistoryEntry> GetAll()
         {
-            return _workforceDbContext.History.OrderByDescending(h => h.Date).ToList();
+            return _workforceDbContext.History.OrderByDescending(h => h.CreatedAt).ToList();
         }
 
         public List<HistoryEntry> GetEntriesForEmployee(int employeeId)
         {
             return _workforceDbContext.History
                 .Where(h => h.Target.Id == employeeId)
-                .OrderByDescending(h => h.Date)
+                .OrderByDescending(h => h.CreatedAt)
                 .ToList();
         }
 

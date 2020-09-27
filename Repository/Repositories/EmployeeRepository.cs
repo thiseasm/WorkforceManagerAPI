@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Database.DbModels;
 using Repository.Interfaces;
@@ -11,7 +12,7 @@ namespace Repository.Repositories
 
         public EmployeeRepository(WorkforceContext workforceContext)
         {
-            _workforceDbContext = workforceContext;
+            _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
         }
 
         public List<Employee> GetAll()
@@ -24,7 +25,12 @@ namespace Repository.Repositories
             return _workforceDbContext.Employees.FirstOrDefault(e => e.Id == id && !e.IsDeleted);
         }
 
-        public void DeleteEmployee(int id)
+        public List<Employee> GetEmployeesBySearchTerm(string term)
+        {
+            return _workforceDbContext.Employees.Where(e => e.Name.Contains(term) || e.Surname.Contains(term)).ToList();
+        }
+
+        public void RemoveEmployee(int id)
         {
             var employee = _workforceDbContext.Employees.FirstOrDefault(e => e.Id == id);
             if(employee == null || employee.IsDeleted)
@@ -35,7 +41,7 @@ namespace Repository.Repositories
             _workforceDbContext.SaveChanges();
         }
 
-        public void SaveOrUpdate(Employee employee)
+        public void SaveEmployee(Employee employee)
         {
             if(employee.Id == 0)
                 _workforceDbContext.Employees.Add(employee);
@@ -46,7 +52,7 @@ namespace Repository.Repositories
             _workforceDbContext.SaveChanges();
         }
 
-        public void MassDelete(List<int> ids)
+        public void MassRemoveEmployees(List<int> ids)
         {
             var employeesToBeDeleted = _workforceDbContext.Employees.Where(e => ids.Contains(e.Id));
             foreach (var employee in employeesToBeDeleted)

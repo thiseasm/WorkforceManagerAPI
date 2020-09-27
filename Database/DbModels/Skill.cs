@@ -7,10 +7,13 @@ namespace Database.DbModels
     {
         [Required]
         public int Id { get; set; }
+
         [Required]
-        public string Name { get; set; }
+        public string Title { get; set; }
+
         [Required]
-        public DateTime CreationDate { get; set; }
+        public DateTime CreatedAt { get; set; }
+
         public string Description { get; set; }
     }
 }

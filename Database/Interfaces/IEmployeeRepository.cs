@@ -7,7 +7,7 @@ namespace Repository.Interfaces
     {
         List<Employee> GetAll();
         Employee GetEmployeeById(int id);
-        List<Employee> GetEmployeesBySearchTerm(string term);
+        Employee GetEmployeeBySearchTerm(string term);
         void RemoveEmployee(int id);
         void SaveEmployee(Employee employee);
         void MassRemoveEmployees(List<int> ids);

@@ -39,7 +39,7 @@ namespace WorkforceManagerAPI.Controllers
         [HttpPost]
         public ActionResult<Skill> SaveSkill(Skill skill)
         {
-            _skillRepository.SaveOrUpdate(skill);
+            _skillRepository.SaveSkill(skill);
             return CreatedAtAction("GetSkills",null);
         }
 
@@ -47,16 +47,16 @@ namespace WorkforceManagerAPI.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Skill> DeleteSkill(int id)
         {
-            _skillRepository.Delete(id);
+            _skillRepository.RemoveSkill(id);
             return Ok();
         }
 
-        // DELETE: api/Skill/MassDelete
+        // DELETE: api/Skill/MassRemoveEmployees
         [HttpDelete]
-        [Route("MassDelete")]
+        [Route("MassRemoveEmployees")]
         public ActionResult<Skill> MassDelete(List<int> ids)
         {
-            _skillRepository.MassDelete(ids);
+            _skillRepository.MassRemoveSkills(ids);
             return Ok();
         }
     }

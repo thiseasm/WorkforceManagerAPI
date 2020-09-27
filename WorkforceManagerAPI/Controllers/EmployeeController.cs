@@ -51,16 +51,16 @@ namespace WorkforceManagerAPI.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Employee> DeleteEmployee(int id)
         {
-            _employeeRepository.DeleteEmployee(id);
+            _employeeRepository.RemoveEmployee(id);
             return Ok();
         }
 
         // DELETE: api/Employee
         [HttpDelete]
-        [Route("MassDelete")]
+        [Route("MassRemoveEmployees")]
         public ActionResult<Employee> MassDelete(List<int> ids)
         {
-            _employeeRepository.MassDelete(ids);
+            _employeeRepository.MassRemoveEmployees(ids);
             return Ok();
         }
 
@@ -78,20 +78,20 @@ namespace WorkforceManagerAPI.Controllers
             var removedEntry = GenerateRemovedEntry(employee, registered);
             var addedEntry = GeneratedAddedEntry(employee, registered);
 
-            _employeeRepository.SaveOrUpdate(employee);
+            _employeeRepository.SaveEmployee(employee);
             _historyRepository.LogEntry(addedEntry);
             _historyRepository.LogEntry(removedEntry);
         }
 
         private void RegisterEmployee(Employee employee)
         {
-            _employeeRepository.SaveOrUpdate(employee);
+            _employeeRepository.SaveEmployee(employee);
             if(employee.Skillset == null || !employee.Skillset.Any())
                 return;
 
             var entry = new HistoryEntry
             {
-                Date = DateTime.Now,
+                CreatedAt = DateTime.Now,
                 Description = "Added",
                 Target = employee,
                 ChangedSkills = employee.Skillset
@@ -105,7 +105,7 @@ namespace WorkforceManagerAPI.Controllers
                 .ToList();
             return new HistoryEntry
             {
-                Date = DateTime.Now,
+                CreatedAt = DateTime.Now,
                 Description = "Added",
                 Target = employee,
                 ChangedSkills = skillsAdded
@@ -118,7 +118,7 @@ namespace WorkforceManagerAPI.Controllers
                 .ToList();
             return new HistoryEntry
             {
-                Date = DateTime.Now,
+                CreatedAt = DateTime.Now,
                 Description = "Removed",
                 Target = employee,
                 ChangedSkills = skillsRemoved
