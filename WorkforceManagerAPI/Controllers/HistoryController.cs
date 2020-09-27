@@ -20,19 +20,13 @@ namespace WorkforceManagerAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<HistoryEntry>> GetHistory()
         {
-            return _historyRepository.GetAll();
-        }
-
-        // GET: api/History/id
-        [HttpGet("{id}")]
-        public  ActionResult<IEnumerable<HistoryEntry>> GetHistoryForEmployee(int id)
-        {
-            var employeeHistory = _historyRepository.GetEntriesForEmployee(id);
-
-            if (employeeHistory == null)
+            var getHistoryResult = _historyRepository.GetAll();
+            if (!getHistoryResult.Success)
+            {
                 return NotFound();
-            
-            return employeeHistory;
+            }
+
+            return getHistoryResult.Data;
         }
     }
 }

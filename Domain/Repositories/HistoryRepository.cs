@@ -63,7 +63,25 @@ namespace Domain.Repositories
             {
                 result.Message = ex.Message;
             }
-            return  result
+
+            return result;
+        }
+
+        public Result LogEntries(List<HistoryEntry> entries)
+        {
+            var result = new Result();
+            try
+            {
+                _workforceDbContext.History.AddRange(entries);
+                _workforceDbContext.SaveChanges();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
     }
 }

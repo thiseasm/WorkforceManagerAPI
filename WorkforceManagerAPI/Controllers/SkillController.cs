@@ -20,35 +20,58 @@ namespace WorkforceManagerAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Skill>> GetSkills()
         {
-            return _skillRepository.GetAll();
+            var getResult = _skillRepository.GetAll();
+            if (getResult.Success)
+            {
+                return getResult.Data;
+            }
+
+            return NotFound();
         }
 
         // GET: api/Skill/id
         [HttpGet("{id}")]
         public ActionResult<Skill> GetSkill(int id)
         {
-            var skill = _skillRepository.GetSkillById(id);
 
-            if (skill == null)
-                return NotFound();
-            
-            return skill;
+            var getResult = _skillRepository.GetSkillById(id);
+
+            if (getResult.Success)
+            {
+                return getResult.Data;
+            }
+
+            return NotFound();
         }
 
         // POST: api/Skill
         [HttpPost]
         public ActionResult<Skill> SaveSkill(Skill skill)
         {
-            _skillRepository.SaveSkill(skill);
-            return CreatedAtAction("GetSkills",null);
+            var saveEmployeeResult = _skillRepository.SaveSkill(skill);
+            if (!saveEmployeeResult.Success)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
         }
 
         // DELETE: api/Skill/id
         [HttpDelete("{id}")]
         public ActionResult<Skill> DeleteSkill(int id)
         {
-            _skillRepository.RemoveSkill(id);
-            return Ok();
+
+            var removeResult = _skillRepository.RemoveSkill(id);
+            
+
+            if (removeResult.Success)
+                return Ok();
+
+            if(removeResult.Message.Equals("NotFound"))
+                return NotFound();
+
+            return BadRequest();
         }
 
         // DELETE: api/Skill/MassRemoveEmployees
@@ -56,8 +79,11 @@ namespace WorkforceManagerAPI.Controllers
         [Route("MassRemoveEmployees")]
         public ActionResult<Skill> MassDelete(List<int> ids)
         {
-            _skillRepository.MassRemoveSkills(ids);
-            return Ok();
+            var removeResult = _skillRepository.MassRemoveSkills(ids);
+            if(removeResult.Success)
+                return Ok();
+
+            return BadRequest();
         }
     }
 }

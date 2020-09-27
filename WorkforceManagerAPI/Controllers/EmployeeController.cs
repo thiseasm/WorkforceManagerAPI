@@ -24,10 +24,10 @@ namespace WorkforceManagerAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Employee>> GetEmployees()
         {
-            var employees = _employeeRepository.GetAll();
-            if (employees.Success)
+            var getResult = _employeeRepository.GetAll();
+            if (getResult.Success)
             {
-                return employees.Data;
+                return getResult.Data;
             }
 
             return NotFound();
@@ -38,30 +38,55 @@ namespace WorkforceManagerAPI.Controllers
         [HttpGet("{id}")]
         public ActionResult<Employee> GetEmployee(int id)
         {
-            var employee = _employeeRepository.GetEmployeeById(id);
+            var getResult = _employeeRepository.GetEmployeeById(id);
 
-            if (employee.Success)
+            if (getResult.Success)
             {
-                return employee.Data;
+                return getResult.Data;
             }
 
             return NotFound();
+        }
+
+        // GET: api/Employee/id/History
+        [HttpGet("{id}/History")]
+        public  ActionResult<IEnumerable<HistoryEntry>> GetHistoryForEmployee(int id)
+        {
+            var employeeHistoryResult = _historyRepository.GetEntriesForEmployee(id);
+
+            if (!employeeHistoryResult.Success)
+                return NotFound();
+            
+            return employeeHistoryResult.Data;
         }
 
         // POST: api/Employee
         [HttpPost]
         public ActionResult<Employee> SaveEmployee(Employee employee)
         {
-            LogHistoryAndSave(employee);
-            return CreatedAtAction("GetEmployees",null);
+            var saveEmployeeResult = LogHistoryAndSave(employee);
+            if (!saveEmployeeResult.Success)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
         }
 
         // DELETE: api/Employee/id
         [HttpDelete("{id}")]
         public ActionResult<Employee> DeleteEmployee(int id)
         {
-            _employeeRepository.RemoveEmployee(id);
-            return Ok();
+            var removeResult = _employeeRepository.RemoveEmployee(id);
+
+            if (removeResult.Success)
+                return Ok();
+
+            if(removeResult.Message.Equals("NotFound"))
+                return NotFound();
+
+            return BadRequest();
+
         }
 
         // DELETE: api/Employee
@@ -69,52 +94,99 @@ namespace WorkforceManagerAPI.Controllers
         [Route("MassRemoveEmployees")]
         public ActionResult<Employee> MassDelete(List<int> ids)
         {
-            _employeeRepository.MassRemoveEmployees(ids);
-            return Ok();
+            var removeResult = _employeeRepository.MassRemoveEmployees(ids);
+            if(removeResult.Success)
+                return Ok();
+
+            return BadRequest();
         }
 
-        private void LogHistoryAndSave(Employee employee)
+        private Result LogHistoryAndSave(Employee employee)
         {
-            var registeredEmployee = _employeeRepository.GetEmployeeById(employee.Id);
-            if (registeredEmployee == null)
-                RegisterEmployee(employee);
-            else
-                UpdateEmployee(employee,registeredEmployee);
+            var getEmployeeResult = _employeeRepository.GetEmployeeById(employee.Id);
+            if (!getEmployeeResult.Success)
+            {
+                return getEmployeeResult;
+            }
+
+            return getEmployeeResult.Data != null 
+                ? RegisterEmployee(employee)
+                : UpdateEmployee(employee,getEmployeeResult.Data);
         }
 
-        private void UpdateEmployee(Employee employee,Employee registered)
+        private Result UpdateEmployee(Employee employee,Employee registered)
         {
+            var result = new Result();
             var removedEntry = GenerateRemovedEntry(employee, registered);
             var addedEntry = GeneratedAddedEntry(employee, registered);
 
-            _employeeRepository.SaveEmployee(employee);
-            _historyRepository.LogEntry(addedEntry);
-            _historyRepository.LogEntry(removedEntry);
+            var saveResult = _employeeRepository.SaveEmployee(employee);
+            if (!saveResult.Success)
+            {
+                result.Message ="SaveEmployeeFailed";
+                return result;
+            }
+
+            var entries = new List<HistoryEntry>{addedEntry,removedEntry};
+            var saveHistoryResult = _historyRepository.LogEntries(entries);
+            if (!saveHistoryResult.Success)
+            {
+                result.Message = "SaveHistoryFailed";
+                return result;
+            }
+
+            result.Success = true;
+            return result;
         }
 
-        private void RegisterEmployee(Employee employee)
+        private Result RegisterEmployee(Employee employee)
         {
-            _employeeRepository.SaveEmployee(employee);
-            if(employee.Skillset == null || !employee.Skillset.Any())
-                return;
-
-            var entry = new HistoryEntry
+            var result = new Result();
+            var saveResult = _employeeRepository.SaveEmployee(employee);
+            if (!saveResult.Success)
             {
-                CreatedAt = DateTime.Now,
+                result.Message ="SaveEmployeeFailed";
+                return result;
+            }
+            
+
+            if (employee.Skillset == null || !employee.Skillset.Any())
+            {
+                result.Success = true;
+                return result;
+            }
+
+            var entry = GeneratedAddedEntry(employee);
+            var saveHistoryResult = _historyRepository.LogEntry(entry);
+            if (!saveHistoryResult.Success)
+            {
+                result.Message = "SaveHistoryFailed";
+                return result;
+            }
+
+            result.Success = true;
+            return result;
+        }
+
+        private static HistoryEntry GeneratedAddedEntry(Employee employee)
+        {
+            return new HistoryEntry
+            {
+                CreatedAt = DateTimeOffset.Now,
                 Description = "Added",
                 Target = employee,
                 ChangedSkills = employee.Skillset
             };
-            _historyRepository.LogEntry(entry);
         }
 
         private static HistoryEntry GeneratedAddedEntry(Employee employee, Employee registeredEmployee)
         {
             var skillsAdded = employee.Skillset.Where(e => !registeredEmployee.Skillset.Select(s => s.Id).Contains(e.Id))
                 .ToList();
+
             return new HistoryEntry
             {
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTimeOffset.Now,
                 Description = "Added",
                 Target = employee,
                 ChangedSkills = skillsAdded
@@ -125,9 +197,10 @@ namespace WorkforceManagerAPI.Controllers
         {
             var skillsRemoved = registeredEmployee.Skillset.Where(e => !employee.Skillset.Select(s => s.Id).Contains(e.Id))
                 .ToList();
+
             return new HistoryEntry
             {
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTimeOffset.Now,
                 Description = "Removed",
                 Target = employee,
                 ChangedSkills = skillsRemoved

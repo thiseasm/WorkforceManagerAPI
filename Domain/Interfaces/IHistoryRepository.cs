@@ -8,5 +8,6 @@ namespace Domain.Interfaces
         GenericResult<List<HistoryEntry>> GetAll();
         GenericResult<List<HistoryEntry>> GetEntriesForEmployee(int employeeId);
         Result LogEntry(HistoryEntry entry);
+        Result LogEntries(List<HistoryEntry> entries);
     }
 }
