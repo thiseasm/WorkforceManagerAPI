@@ -65,8 +65,8 @@ namespace Domain.Repositories
 
         public Result SaveSkill(Skill skill)
         {
-
             var result = new Result();
+            skill.CreatedAt = DateTimeOffset.Now;
             try
             {
                 if(skill.Id == 0)

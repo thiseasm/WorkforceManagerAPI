@@ -13,7 +13,7 @@ namespace Domain.Models
         public string Title { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         public string Description { get; set; }
 
