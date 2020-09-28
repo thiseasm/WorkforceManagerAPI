@@ -54,7 +54,7 @@ namespace Domain.Repositories
             var result = new GenericResult<List<Skill>>();
             try
             {
-                result.Data = _workforceDbContext.Skills.Where(s => ids.Contains(s.Id)).AsNoTracking().ToList();
+                result.Data = _workforceDbContext.Skills.Where(s => ids.Contains(s.Id)).ToList();
                 result.Success = true;
             }
             catch (Exception ex)
@@ -127,6 +127,21 @@ namespace Domain.Repositories
                 var skillsToBeRemoved = _workforceDbContext.Skills.Where(s => ids.Contains(s.Id));
                 _workforceDbContext.RemoveRange(skillsToBeRemoved);
                 result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public Result SaveChanges()
+        {
+            var result = new Result();
+            try
+            {
+                _workforceDbContext.SaveChanges();
             }
             catch (Exception ex)
             {

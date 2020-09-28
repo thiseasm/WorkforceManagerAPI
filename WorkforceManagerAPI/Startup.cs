@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Services.Interfaces;
+using Services.ServicesImplementation;
 
 namespace WorkforceManagerAPI
 {
@@ -28,6 +30,10 @@ namespace WorkforceManagerAPI
             services.AddScoped<ISkillRepository, SkillRepository>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IHistoryRepository, HistoryRepository>();
+            services.AddScoped<IEmployeeSkillRepository, EmployeeSkillRepository>();
+
+            services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<ISkillService, SkillService>();
 
             services.AddCors(options =>
             {

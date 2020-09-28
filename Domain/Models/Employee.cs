@@ -26,7 +26,7 @@ namespace Domain.Models
         [NotMapped]
         public int[] SkillIds { get; set; }
         
-        public ICollection<EmployeeSkill> EmployeeSkillset { get; set; }
-        public ICollection<HistoryEntry> History { get; set; }
+        public ICollection<EmployeeSkill> EmployeeSkillset { get; set; } = new List<EmployeeSkill>();
+        public ICollection<HistoryEntry> History { get; set; } = new List<HistoryEntry>();
     }
 }

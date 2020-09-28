@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
 using Domain.Models;
 
-namespace Domain.Interfaces
+namespace Services.Interfaces
 {
-    public interface IEmployeeRepository
+    public interface IEmployeeService
     {
         GenericResult<List<Employee>> GetAll();
         GenericResult<Employee> GetEmployeeById(int id);
-        GenericResult<Employee> GetEmployeeByIdWithoutSkills(int id);
+        GenericResult<List<HistoryEntry>> GetHistoryEntriesForEmployee(int employeeId);
         GenericResult<List<Employee>> GetEmployeesBySearchTerm(string term);
         Result RemoveEmployee(int id);
-        Result SaveEmployee(Employee employee);
+        Result LogHistoryAndSave(Employee employee);
         Result MassRemoveEmployees(List<int> ids);
-        Result SaveChanges();
     }
 }

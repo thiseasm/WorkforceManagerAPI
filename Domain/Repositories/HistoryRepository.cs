@@ -85,5 +85,20 @@ namespace Domain.Repositories
 
             return result;
         }
+
+        public Result SaveChanges()
+        {
+            var result = new Result();
+            try
+            {
+                _workforceDbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
     }
 }

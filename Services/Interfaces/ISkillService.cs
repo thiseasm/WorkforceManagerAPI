@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Domain.Models;
 
-namespace Domain.Interfaces
+namespace Services.Interfaces
 {
-    public interface ISkillRepository
+    public interface ISkillService
     {
         GenericResult<List<Skill>> GetAll();
         GenericResult<Skill> GetSkillById(int id);
@@ -11,6 +11,5 @@ namespace Domain.Interfaces
         Result SaveSkill(Skill skill);
         Result RemoveSkill(int id);
         Result MassRemoveSkills(List<int> ids);
-        Result SaveChanges();
     }
 }

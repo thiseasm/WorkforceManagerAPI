@@ -118,11 +118,13 @@ namespace Domain.Repositories
             try
             {
                 if (employee.Id == 0)
+                {
                     _workforceDbContext.Employees.Add(employee);
+                }
                 else
+                {
                     _workforceDbContext.Employees.Update(employee);
-            
-                _workforceDbContext.SaveChanges();
+                }
                 result.Success = true;
             }
             catch (Exception ex)
@@ -133,14 +135,11 @@ namespace Domain.Repositories
             return result;
         }
 
-        public Result SaveEmployee(Employee employee, IList<EmployeeSkill> skillsToRemove)
+        public Result SaveChanges()
         {
             var result = new Result();
             try
             {
-                _workforceDbContext.Employees.Update(employee);
-
-                _workforceDbContext.RemoveRange(skillsToRemove);
                 _workforceDbContext.SaveChanges();
                 result.Success = true;
             }
