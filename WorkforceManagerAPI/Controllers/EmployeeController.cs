@@ -155,11 +155,13 @@ namespace WorkforceManagerAPI.Controllers
                     return result;
 
                 skillsToRemove = employeeSkills.Where(s => !employee.SkillIds.Contains(s.SkillId)).ToList();
+                var skillsToAdd = getSkillsResult.Data
+                    .Select(skill => new EmployeeSkill {Employee = employee, Skill = skill, SkillId = skill.Id}).ToList();
 
-                foreach (var skillAdded in getSkillsResult.Data.Select(skill => new EmployeeSkill
-                    {Employee = employee, Skill = skill, SkillId = skill.Id}))
+                foreach (var skillAdded in skillsToAdd)
                 {
-                    employeeSkills.Add(skillAdded);
+                    if(employeeSkills.All(es => es.SkillId != skillAdded.Skill.Id))
+                        employeeSkills.Add(skillAdded);
                 }
 
                 var removedEntry = GenerateRemovedEntry(employee, registered);

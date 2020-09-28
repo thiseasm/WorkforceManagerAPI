@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Interfaces;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Repositories
 {
@@ -13,6 +14,7 @@ namespace Domain.Repositories
         public HistoryRepository(WorkforceContext workforceContext)
         {
             _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
+            _workforceDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public GenericResult<List<HistoryEntry>> GetAll()

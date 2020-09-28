@@ -14,6 +14,7 @@ namespace Domain.Repositories
         public EmployeeRepository(WorkforceContext workforceContext)
         {
             _workforceDbContext = workforceContext ?? throw new ArgumentNullException();
+            _workforceDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public GenericResult<List<Employee>> GetAll()
