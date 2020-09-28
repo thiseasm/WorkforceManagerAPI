@@ -50,6 +50,24 @@ namespace Domain.Repositories
             return result;
         }
 
+        public GenericResult<Employee> GetEmployeeByIdWithoutSkills(int id)
+        {
+            var result = new GenericResult<Employee>();
+            try
+            {
+                result.Data = _workforceDbContext.Employees.Where(e => e.Id == id && !e.IsDeleted)
+                    .Include(e => e.EmployeeSkillset)
+                    .AsNoTracking().FirstOrDefault();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
         public GenericResult<List<Employee>> GetEmployeesBySearchTerm(string term)
         {
             var result = new GenericResult<List<Employee>>();
@@ -103,6 +121,25 @@ namespace Domain.Repositories
                 else
                     _workforceDbContext.Employees.Update(employee);
             
+                _workforceDbContext.SaveChanges();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public Result SaveEmployee(Employee employee, IList<EmployeeSkill> skillsToRemove)
+        {
+            var result = new Result();
+            try
+            {
+                _workforceDbContext.Employees.Update(employee);
+
+                _workforceDbContext.RemoveRange(skillsToRemove);
                 _workforceDbContext.SaveChanges();
                 result.Success = true;
             }

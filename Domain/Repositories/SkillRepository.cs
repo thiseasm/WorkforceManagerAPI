@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Interfaces;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Repositories
 {
@@ -36,7 +37,7 @@ namespace Domain.Repositories
             var result = new GenericResult<Skill>();
             try
             {
-                result.Data = _workforceDbContext.Skills.FirstOrDefault(s => s.Id == id);
+                result.Data = _workforceDbContext.Skills.AsNoTracking().FirstOrDefault(s => s.Id == id);
                 result.Success = true;
             }
             catch (Exception ex)
@@ -52,7 +53,7 @@ namespace Domain.Repositories
             var result = new GenericResult<List<Skill>>();
             try
             {
-                result.Data = _workforceDbContext.Skills.Where(s => ids.Contains(s.Id)).ToList();
+                result.Data = _workforceDbContext.Skills.Where(s => ids.Contains(s.Id)).AsNoTracking().ToList();
                 result.Success = true;
             }
             catch (Exception ex)

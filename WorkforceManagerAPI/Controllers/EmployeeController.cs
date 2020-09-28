@@ -49,7 +49,6 @@ namespace WorkforceManagerAPI.Controllers
             }
 
             var employee = getResult.Data;
-            var skills = _skillRepository.GetSkillsById(employee.EmployeeSkillset.Select(s => s.SkillId).ToList());
 
             var employeeViewModel = new EmployeeViewModel
             {
@@ -57,11 +56,12 @@ namespace WorkforceManagerAPI.Controllers
                 Name = employee.Name,
                 Surname = employee.Surname,
                 HiredAt = employee.HiredAt.ToString("d"),
+                Skills = new List<SkillViewModel>()
             };
 
-            if (skills.Success && skills.Data != null)
+            if (employee.EmployeeSkillset.Select(s => s.Skill).Any())
             {
-                employeeViewModel.Skills = skills.Data.Select(s => new SkillViewModel
+                employeeViewModel.Skills = employee.EmployeeSkillset.Select(s => s.Skill).Select(s => new SkillViewModel
                 {
                     CreatedAt = s.CreatedAt.ToString("d"),
                     Description = s.Description,
@@ -130,13 +130,13 @@ namespace WorkforceManagerAPI.Controllers
 
         private Result LogHistoryAndSave(Employee employee)
         {
-            var getEmployeeResult = _employeeRepository.GetEmployeeById(employee.Id);
+            var getEmployeeResult = _employeeRepository.GetEmployeeByIdWithoutSkills(employee.Id);
             if (!getEmployeeResult.Success)
             {
                 return getEmployeeResult;
             }
 
-            return (getEmployeeResult.Data == null && employee.Id ==0)
+            return (getEmployeeResult.Data == null && employee.Id == 0)
                 ? RegisterEmployee(employee)
                 : UpdateEmployee(employee,getEmployeeResult.Data);
         }
@@ -144,7 +144,8 @@ namespace WorkforceManagerAPI.Controllers
         private Result UpdateEmployee(Employee employee,Employee registered)
         {
             var result = new Result();
-            var employeeSkills = new List<EmployeeSkill>();
+            var employeeSkills = registered.EmployeeSkillset ?? new List<EmployeeSkill>();
+            var skillsToRemove = new List<EmployeeSkill>();
             registered.History ??= new List<HistoryEntry>();
 
             if (employee.SkillIds != null && employee.SkillIds.Any())
@@ -153,27 +154,35 @@ namespace WorkforceManagerAPI.Controllers
                 if (!getSkillsResult.Success)
                     return result;
 
-                employeeSkills.AddRange(getSkillsResult.Data.Select(skill => new EmployeeSkill {Employee = employee,EmployeeId = employee.Id,Skill = skill, SkillId = skill.Id}));
+                skillsToRemove = employeeSkills.Where(s => !employee.SkillIds.Contains(s.SkillId)).ToList();
+
+                foreach (var skillAdded in getSkillsResult.Data.Select(skill => new EmployeeSkill
+                    {Employee = employee, Skill = skill, SkillId = skill.Id}))
+                {
+                    employeeSkills.Add(skillAdded);
+                }
 
                 var removedEntry = GenerateRemovedEntry(employee, registered);
                 var addedEntry = GeneratedAddedEntry(employee, registered);
-                employee.EmployeeSkillset = employeeSkills;
+
                 registered.History.Add(removedEntry);
                 registered.History.Add(addedEntry);
             }
             else
             {
-                if (employee.EmployeeSkillset != null)
+                skillsToRemove = employeeSkills.ToList();
+
+                if (registered.EmployeeSkillset != null && registered.EmployeeSkillset.Any())
                 {
-                    employee.EmployeeSkillset.Clear();
                     var removedEntry = GenerateRemovedEntry(employee, registered);
                     registered.History.Add(removedEntry);
                 }
             }
 
+            employee.EmployeeSkillset = employeeSkills;
             employee.History = registered.History;
 
-            var saveResult = _employeeRepository.SaveEmployee(employee);
+            var saveResult = _employeeRepository.SaveEmployee(employee,skillsToRemove);
             if (!saveResult.Success)
             {
                 result.Message ="SaveEmployeeFailed";
@@ -255,10 +264,21 @@ namespace WorkforceManagerAPI.Controllers
 
         private HistoryEntry GenerateRemovedEntry(Employee employee, Employee registeredEmployee)
         {
-            var skillIdsRemoved = registeredEmployee.EmployeeSkillset
-                                            .Select(es => es.SkillId)
-                                            .Where(e => !employee.SkillIds.Contains(e))
-                                        .ToList();
+            List<int> skillIdsRemoved;
+
+            if (employee.SkillIds == null)
+            {
+                skillIdsRemoved = registeredEmployee.EmployeeSkillset.Select(s => s.SkillId).ToList();
+            }
+            else
+            {
+                skillIdsRemoved = registeredEmployee.EmployeeSkillset
+                                    .Select(es => es.SkillId)
+                                    .Where(e => !employee.SkillIds.Contains(e))
+                                    .ToList();
+            }
+                
+                
 
             var getSkillsRemovedResult = _skillRepository.GetSkillsById(skillIdsRemoved);
             if (!getSkillsRemovedResult.Success)
