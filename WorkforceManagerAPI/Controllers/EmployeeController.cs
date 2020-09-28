@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -41,31 +40,19 @@ namespace WorkforceManagerAPI.Controllers
 
             if (!getResult.Success)
             {
-                return NotFound();;
+                return NotFound();
             }
 
             var employee = getResult.Data;
+            var employeeViewModel = new EmployeeViewModel(employee);
+            var employeeSkills = employee.EmployeeSkillset.Select(s => s.Skill).ToList();
 
-            var employeeViewModel = new EmployeeViewModel
+            if (employeeSkills.Any())
             {
-                Id = employee.Id,
-                Name = employee.Name,
-                Surname = employee.Surname,
-                HiredAt = employee.HiredAt.ToString("d"),
-                Skills = new List<SkillViewModel>()
-            };
-
-            if (employee.EmployeeSkillset.Select(s => s.Skill).Any())
-            {
-                employeeViewModel.Skills = employee.EmployeeSkillset.Select(s => s.Skill).Select(s => new SkillViewModel
+                foreach (var skill in employeeSkills)
                 {
-                    CreatedAt = s.CreatedAt.ToString("d"),
-                    Description = s.Description,
-                    Id = s.Id,
-                    Title = s.Title
-
-                })
-                .ToList();
+                    employeeViewModel.Skills.Add(new SkillViewModel(skill));
+                }
             }
 
             return employeeViewModel;

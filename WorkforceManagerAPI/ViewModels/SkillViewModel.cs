@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Domain.Models;
 
 namespace WorkforceManagerAPI.ViewModels
 {
@@ -11,5 +8,13 @@ namespace WorkforceManagerAPI.ViewModels
         public string Title { get; set; }
         public string Description { get; set; }
         public string CreatedAt { get; set; }
+
+        public SkillViewModel(Skill skill)
+        {
+            Id = skill.Id;
+            Title = skill.Title;
+            Description = skill.Description;
+            CreatedAt = skill.CreatedAt.ToString("d");
+        }
     }
 }

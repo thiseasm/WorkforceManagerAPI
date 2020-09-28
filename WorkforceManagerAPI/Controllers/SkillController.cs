@@ -43,14 +43,8 @@ namespace WorkforceManagerAPI.Controllers
             }
 
             var skill = getResult.Data;
-            return new SkillViewModel
-            {
-                Id = skill.Id,
-                CreatedAt = skill.CreatedAt.ToString("d"),
-                Description = skill.Description,
-                Title = skill.Title
-            };
-            
+            return new SkillViewModel(skill);
+
         }
 
         // POST: api/Skill

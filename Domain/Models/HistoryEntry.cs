@@ -18,6 +18,6 @@ namespace Domain.Models
         [Required]
         public DateTimeOffset CreatedAt { get; set; }
         [Required]
-        public ICollection<SkillHistory> ChangedSkills { get; set; }
+        public ICollection<SkillHistory> ChangedSkills { get; set; } = new List<SkillHistory>();
     }
 }

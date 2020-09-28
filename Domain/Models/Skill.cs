@@ -17,8 +17,8 @@ namespace Domain.Models
 
         public string Description { get; set; }
 
-        public ICollection<EmployeeSkill> EmployeeSkill { get; set; }
+        public ICollection<EmployeeSkill> EmployeeSkill { get; set; } = new List<EmployeeSkill>();
 
-        public ICollection<SkillHistory> SkillHistory { get; set; }
+        public ICollection<SkillHistory> SkillHistory { get; set; } = new List<SkillHistory>();
     }
 }
