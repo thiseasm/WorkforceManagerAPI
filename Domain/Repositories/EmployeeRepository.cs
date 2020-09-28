@@ -39,7 +39,7 @@ namespace Domain.Repositories
             {
                 result.Data = _workforceDbContext.Employees.Where(e => e.Id == id && !e.IsDeleted)
                     .Include(e => e.EmployeeSkillset)
-                    .ThenInclude(es => es.Skill).FirstOrDefault();
+                    .ThenInclude(es => es.Skill).AsNoTracking().FirstOrDefault();
                 result.Success = true;
             }
             catch (Exception ex)

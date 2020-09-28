@@ -69,7 +69,7 @@ namespace Domain.Repositories
             skill.CreatedAt = DateTimeOffset.Now;
             try
             {
-                if(skill.Id == 0)
+                if(skill.Id != 0)
                     _workforceDbContext.Skills.Update(skill);
                 else
                     _workforceDbContext.Skills.Add(skill);

@@ -2,6 +2,7 @@
 using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using WorkforceManagerAPI.ViewModels;
 
 namespace WorkforceManagerAPI.Controllers
 {
@@ -31,17 +32,25 @@ namespace WorkforceManagerAPI.Controllers
 
         // GET: api/Skill/id
         [HttpGet("{id}")]
-        public ActionResult<Skill> GetSkill(int id)
+        public ActionResult<SkillViewModel> GetSkill(int id)
         {
 
             var getResult = _skillRepository.GetSkillById(id);
 
-            if (getResult.Success)
+            if (!getResult.Success)
             {
-                return getResult.Data;
+                return NotFound();
             }
 
-            return NotFound();
+            var skill = getResult.Data;
+            return new SkillViewModel
+            {
+                Id = skill.Id,
+                CreatedAt = skill.CreatedAt.ToString("d"),
+                Description = skill.Description,
+                Title = skill.Title
+            };
+            
         }
 
         // POST: api/Skill

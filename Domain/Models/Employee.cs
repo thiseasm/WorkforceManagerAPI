@@ -24,7 +24,7 @@ namespace Domain.Models
         public bool IsDeleted { get; set; }
 
         [NotMapped]
-        public List<int> SkillIds { get; set; }
+        public int[] SkillIds { get; set; }
         
         public ICollection<EmployeeSkill> EmployeeSkillset { get; set; }
         public ICollection<HistoryEntry> History { get; set; }
