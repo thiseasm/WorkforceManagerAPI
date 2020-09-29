@@ -111,17 +111,22 @@ namespace Services.ServicesImplementation
             {
                 registeredEmployee.EmployeeSkillset.Remove(employeeSkill);
             }
+
+            var skillsetIds = employeeSkillsToBeRemoved.Select(es => es.SkillId).ToList();
         }
 
         private Result ClearSkillsetAndSave(Employee registeredEmployee)
         {
             _employeeSkillRepository.RemoveEntries(registeredEmployee.EmployeeSkillset.ToList());
+            var skillsetIds = registeredEmployee.EmployeeSkillset.Select(es => es.SkillId).ToList();
+
             foreach (var skill in registeredEmployee.EmployeeSkillset)
             {
                 registeredEmployee.EmployeeSkillset.Remove(skill);
             }
 
             _employeeRepository.SaveEmployee(registeredEmployee);
+
             return _employeeRepository.SaveChanges();
         }
 
@@ -158,79 +163,28 @@ namespace Services.ServicesImplementation
 
                 _employeeSkillRepository.AddEntries(employee.EmployeeSkillset.ToList());
             }
+            
         }
 
-        private static HistoryEntry GeneratedAddedEntry(Employee employee, IEnumerable<Skill> addedSkills)
+        private void UpdateHistory(Employee employee, IEnumerable<int> skillIds, string verb)
         {
             var historyEntry = new HistoryEntry
             {
                 CreatedAt = DateTimeOffset.Now,
-                Description = "Added",
+                Description = verb,
                 Target = employee
             };
 
-            var changedSkills = addedSkills.Select(skill => new SkillHistory {HistoryEntry = historyEntry, Skill = skill}).ToList();
-            historyEntry.ChangedSkills = changedSkills;
-            return historyEntry;
-        }
-
-        private HistoryEntry GeneratedAddedEntry(Employee employee, Employee registeredEmployee)
-        {
-            var skillIdsAdded = employee.SkillIds
-                                        .Where(id => !registeredEmployee.EmployeeSkillset
-                                                .Select(s => s.SkillId)
-                                                .Contains(id))
-                                        .ToList();
-
-            var getSkillsAddedResult = _skillRepository.GetSkillsById(skillIdsAdded);
-            if (!getSkillsAddedResult.Success)
-                return null;
-
-            var historyEntry = new HistoryEntry
+            foreach (var id in skillIds)
             {
-                CreatedAt = DateTimeOffset.Now,
-                Description = "Added",
-                Target = employee,
-            };
-            var addedSkills = getSkillsAddedResult.Data.Select(skill => new SkillHistory {HistoryEntry = historyEntry, Skill = skill}).ToList();
-
-            historyEntry.ChangedSkills = addedSkills;
-            return historyEntry;
-        }
-
-        private HistoryEntry GenerateRemovedEntry(Employee employee, Employee registeredEmployee)
-        {
-            List<int> skillIdsRemoved;
-
-            if (employee.SkillIds == null)
-            {
-                skillIdsRemoved = registeredEmployee.EmployeeSkillset.Select(s => s.SkillId).ToList();
+                historyEntry.ChangedSkills.Add(new SkillHistory
+                {
+                    HistoryEntry = historyEntry,
+                    SkillId = id
+                });
             }
-            else
-            {
-                skillIdsRemoved = registeredEmployee.EmployeeSkillset
-                                    .Select(es => es.SkillId)
-                                    .Where(e => !employee.SkillIds.Contains(e))
-                                    .ToList();
-            }
-                
-                
 
-            var getSkillsRemovedResult = _skillRepository.GetSkillsById(skillIdsRemoved);
-            if (!getSkillsRemovedResult.Success)
-                return null;
-
-            var historyEntry = new HistoryEntry
-            {
-                CreatedAt = DateTimeOffset.Now,
-                Description = "Removed",
-                Target = employee
-            };
-
-            var removedSkills = getSkillsRemovedResult.Data.Select(skill => new SkillHistory {HistoryEntry = historyEntry, Skill = skill}).ToList();
-
-            historyEntry.ChangedSkills = removedSkills;
-            return historyEntry;
+            _historyRepository.LogEntry(historyEntry);
         }
     }
 

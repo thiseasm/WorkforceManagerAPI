@@ -57,8 +57,8 @@ namespace Domain.Repositories
             var result = new Result();
             try
             {
+                _workforceDbContext.SkillHistory.UpdateRange(entry.ChangedSkills);
                 _workforceDbContext.History.Add(entry);
-                _workforceDbContext.SaveChanges();
                 result.Success = true;
             }
             catch (Exception ex)
